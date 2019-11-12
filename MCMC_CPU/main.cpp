@@ -6,7 +6,7 @@ using namespace std;
 
 int main() {
     const int dimension = 2;
-    const int num_samples = 20;
+    const int num_samples = 100;
     double** samples = (double**)malloc(num_samples * sizeof(double*));
     for(int i=0; i<num_samples; i++) {
         samples[i] = (double*)malloc(dimension * sizeof(double));

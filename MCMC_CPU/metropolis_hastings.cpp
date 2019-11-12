@@ -5,14 +5,13 @@
 */
 void _generate_initial_state(double initial_state[], int dimension) {
     srand(time(NULL));
-    double random_max = (double) RAND_MAX;
     for(int i=0; i<dimension; i++) {
         initial_state[i] = 2*double(rand())/random_max - 1.0; //generate a number in [-1, 1]
     }
 }
 
 //Box muller method for sampling from Gaussian
-double rand_normal(double mean, double stddev)
+double _rand_normal(double mean, double stddev)
 {
     static double n2 = 0.0;
     static int n2_cached = 0;
@@ -44,10 +43,13 @@ double rand_normal(double mean, double stddev)
 }
 
 void _propose_next_state(double current_state[], double next_state[], int dimension) {
-    double random_max = (double) RAND_MAX;
     for(int i=0; i<dimension; i++) {
-        next_state[i] = current_state[i] + rand_normal(0.0, 1.0); //random walk based on unit Gaussian output
+        next_state[i] = current_state[i] + _rand_normal(0.0, 1.0); //random walk based on unit Gaussian output
     }
+}
+
+double _compute_acceptance_ratio(double current_state[], double proposed_state[], std::function<double (double[])> p) {
+    return p(proposed_state)/p(current_state);
 }
 
 /*
@@ -58,10 +60,13 @@ void _propose_next_state(double current_state[], double next_state[], int dimens
 void metropolis_hastings(std::function<double (double[])> p, int num_samples, int dimension, double** samples) {
     double* current_state = (double*)malloc(dimension * sizeof(double));
     _generate_initial_state(current_state, dimension);
-    for(int i=0; i<num_samples;) {
-        double next_state[dimension];
+    for(int i=0; i<num_samples; i++) {
         _propose_next_state(current_state, samples[i], dimension);
+        double acceptance_ratio = MIN(1.0, _compute_acceptance_ratio(current_state, samples[i], p));
+        double test_probability = rand() / random_max;
+        if(acceptance_ratio < test_probability) { //Reject, copy state forward
+            samples[i] = current_state;
+        }
         current_state = samples[i];
-        i++;
     }
 }
