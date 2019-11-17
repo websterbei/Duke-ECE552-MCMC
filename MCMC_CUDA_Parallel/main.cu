@@ -7,6 +7,8 @@ using namespace std;
 int main(int argc, char* argv[]) {
     const int dimension = 2;
     const int num_samples = argc>1 ? atoi(argv[1]) : 100;
+    const int num_blocks = argc>3 ? atoi(argv[2]) : 1;
+    const int num_threads = argc>3 ? atoi(argv[3]) : 1;
     // Memory allocation
     float** samples;
     cudaMallocManaged(&samples, num_samples*sizeof(float*));
@@ -15,7 +17,7 @@ int main(int argc, char* argv[]) {
         cudaMallocManaged(&samples[i], dimension*sizeof(float));
     }
 
-    metropolis_hastings<<<1,128>>>(num_samples, dimension, samples);
+    metropolis_hastings<<<num_blocks,num_threads>>>(num_samples, dimension, samples);
     cudaDeviceSynchronize();
 
     ofstream output_file;
