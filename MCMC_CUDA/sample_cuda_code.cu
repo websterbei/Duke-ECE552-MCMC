@@ -36,8 +36,8 @@ int main(void)
   std::cout << "Max error: " << maxError << std::endl;
 
   // Free memory
-  cudaFree(x);
-  cudaFree(y);
+  // cudaFree(x);
+  // cudaFree(y);
   
   return 0;
 }

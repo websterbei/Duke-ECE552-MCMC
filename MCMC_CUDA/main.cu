@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include "distribution_function.h"
 #include "metropolis_hastings.h"
 
 using namespace std;
@@ -8,11 +7,16 @@ using namespace std;
 int main(int argc, char* argv[]) {
     const int dimension = 2;
     const int num_samples = argc>1 ? atoi(argv[1]) : 100;
-    double** samples = (double**)malloc(num_samples * sizeof(double*));
+    // Memory allocation
+    float** samples;
+    cudaMallocManaged(&samples, num_samples*sizeof(float*));
+    
     for(int i=0; i<num_samples; i++) {
-        samples[i] = (double*)malloc(dimension * sizeof(double));
+        cudaMallocManaged(&samples[i], dimension*sizeof(float));
     }
-    metropolis_hastings(distribution_function, num_samples, dimension, samples);
+
+    metropolis_hastings<<<1,1>>>(num_samples, dimension, samples);
+    cudaDeviceSynchronize();
 
     ofstream output_file;
     output_file.open("samples.csv");
