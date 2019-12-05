@@ -52,8 +52,8 @@ void _propose_next_state(float current_state[], float next_state[], int dimensio
 }
 
 __device__
-float _compute_acceptance_ratio(float current_state[], float proposed_state[]) {
-    return distribution_function(proposed_state)/distribution_function(current_state);
+float _compute_acceptance_ratio(float current_state[], float proposed_state[], int dimension) {
+    return distribution_function(proposed_state, dimension)/distribution_function(current_state, dimension);
 }
 
 /*
@@ -68,14 +68,14 @@ void metropolis_hastings(int num_samples, int dimension, float** samples) {
     
     int index = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = blockDim.x * gridDim.x;
-
+    
     curandState_t prng_state;
     curand_init(index,0,0,&prng_state);
     _generate_initial_state(current_state, dimension, prng_state);
 
-    for(int i=index; i<num_samples; i+=stride) {
+    for(int i=index; i<num_samples; i+=0) {
         _propose_next_state(current_state, samples[i], dimension, prng_state);
-        float acceptance_ratio = MIN(1.0, _compute_acceptance_ratio(current_state, samples[i]));
+        float acceptance_ratio = MIN(1.0, _compute_acceptance_ratio(current_state, samples[i], dimension));
         float test_probability = curand(&prng_state) / random_max;
         if(acceptance_ratio < test_probability) { //Reject, copy state forward
             for(int j=0; j<dimension; j++) {

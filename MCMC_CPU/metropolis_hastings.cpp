@@ -48,8 +48,8 @@ void _propose_next_state(double current_state[], double next_state[], int dimens
     }
 }
 
-double _compute_acceptance_ratio(double current_state[], double proposed_state[], std::function<double (double[])> p) {
-    return p(proposed_state)/p(current_state);
+double _compute_acceptance_ratio(double current_state[], double proposed_state[], std::function<double (double[], int)> p, int dim) {
+    return p(proposed_state, dim)/p(current_state, dim);
 }
 
 /*
@@ -57,12 +57,12 @@ double _compute_acceptance_ratio(double current_state[], double proposed_state[]
     num_samples: total number of samples to be generated
     dimension: length of parameter vector to the distribution function
 */
-void metropolis_hastings(std::function<double (double[])> p, int num_samples, int dimension, double** samples) {
+void metropolis_hastings(std::function<double (double[], int)> p, int num_samples, int dimension, double** samples) {
     double* current_state = (double*)malloc(dimension * sizeof(double));
     _generate_initial_state(current_state, dimension);
     for(int i=0; i<num_samples; i++) {
         _propose_next_state(current_state, samples[i], dimension);
-        double acceptance_ratio = MIN(1.0, _compute_acceptance_ratio(current_state, samples[i], p));
+        double acceptance_ratio = MIN(1.0, _compute_acceptance_ratio(current_state, samples[i], p, dimension));
         double test_probability = rand() / random_max;
         if(acceptance_ratio < test_probability) { //Reject, copy state forward
             samples[i] = current_state;

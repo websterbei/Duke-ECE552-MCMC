@@ -7,4 +7,4 @@
 #define sy (1.0)
 
 __device__
-float distribution_function(float x[]);
+float distribution_function(float x[], int dim);

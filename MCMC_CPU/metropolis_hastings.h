@@ -8,4 +8,4 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
-void metropolis_hastings(std::function<double (double[])> p, int num_samples, int dimension, double** samples);
+void metropolis_hastings(std::function<double (double[], int)> p, int num_samples, int dimension, double** samples);

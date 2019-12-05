@@ -6,4 +6,4 @@
 #define sx (1.0)
 #define sy (1.0)
 
-double distribution_function(double x[]);
+double distribution_function(double x[], int dim);
